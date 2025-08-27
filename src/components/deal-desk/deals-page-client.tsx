@@ -9,6 +9,7 @@ import {DealDto} from "@/lib/types/deal-desk.types";
 import {SearchMetadata, SearchOptions} from "@/lib/types/search.types";
 import {DealsTable} from "@/components/deal-desk/deals-table";
 import {Input} from "@/components/ui/input";
+import {getDeals} from "@/lib/actions/deal-desk.actions";
 
 interface DealsPageClientProps {
   initialDeals: DealDto[];
@@ -46,7 +47,7 @@ export function DealsPageClient({ initialDeals, initialMetadata }: DealsPageClie
     if (newOptions.orderDirection) params.set('orderDirection', newOptions.orderDirection);
     
     const queryString = params.toString();
-    const newUrl = queryString ? `/dashboard/deals?${queryString}` : '/dashboard/deals';
+    const newUrl = queryString ? `/deal-desk?${queryString}` : '/deal-desk';
     router.push(newUrl);
   };
 
@@ -54,19 +55,10 @@ export function DealsPageClient({ initialDeals, initialMetadata }: DealsPageClie
   const fetchDeals = async (options: SearchOptions) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/deals?${new URLSearchParams({
-        ...(options.queryTerm && { queryTerm: options.queryTerm }),
-        page: (options.page || 1).toString(),
-        limit: (options.limit || 10).toString(),
-        ...(options.orderBy && { orderBy: options.orderBy }),
-        ...(options.orderDirection && { orderDirection: options.orderDirection }),
-      })}`);
-      
-      if (response.ok) {
-        const data = await response.json();
-        setDeals(data.data);
-        setMetadata(data.metadata);
-      }
+      const {data, metadata} = await getDeals(options);
+      setDeals(data);
+     setMetadata(metadata);
+
     } catch (error) {
       console.error('Error fetching deals:', error);
     } finally {
@@ -89,7 +81,7 @@ export function DealsPageClient({ initialDeals, initialMetadata }: DealsPageClie
   );
 
   // Handle search input
-  const handleSearch = (queryTerm: string) => {
+  const handleSearchInput = (queryTerm: string) => {
     setSearchValue(queryTerm);
     debouncedSearch(queryTerm);
   };
@@ -134,7 +126,7 @@ export function DealsPageClient({ initialDeals, initialMetadata }: DealsPageClie
               placeholder="Search deals..."
               className="w-full md:w-[300px] pl-8"
               value={searchValue}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => handleSearchInput(e.target.value)}
             />
           </div>
           

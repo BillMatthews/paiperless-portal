@@ -12,19 +12,16 @@ import {
 } from '@/lib/schemas/password-validation';
 
 // Import types
-import { 
-  ChangePasswordRequest, 
+import {
   ChangePasswordResponse,
-  ForgotPasswordRequest, 
   ForgotPasswordResponse,
-  ResetPasswordRequest, 
   ResetPasswordResponse,
   ApiErrorResponse 
 } from '@/lib/types/authentication.types';
 import { apiPost } from "@/lib/utils/api-client";
 
 // API base URL - should come from environment variables
-const API_BASE_URL = process.env.TRADE_DOC_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.TRADE_DOCUMENTS_API_URL || 'http://localhost:3001/api';
 
 /**
  * Change password for email/password users

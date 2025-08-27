@@ -1,6 +1,7 @@
 "use server"
 
 import {SigningEventDetailsDto} from "@/lib/types/document-signing.types";
+import {apiGet} from "@/lib/utils/api-client";
 
 
 const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
@@ -11,12 +12,7 @@ if (!apiUrl) {
 
 export async function getDocumentSigningEventDetails(signingEventId: string): Promise<SigningEventDetailsDto | null> {
     try {
-        const response = await fetch(`${apiUrl}/document-signing/${signingEventId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await apiGet(`${apiUrl}/document-signing/${signingEventId}`);
 
         if (!response.ok) {
             if (response.status === 404) {
@@ -37,12 +33,7 @@ export async function getDocumentSigningEventDetails(signingEventId: string): Pr
 
 export async function getDocumentSigningEventDetailsByDocumentId(documentId: string): Promise<SigningEventDetailsDto | null> {
     try {
-        const response = await fetch(`${apiUrl}/document-signing/trade-document/${documentId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await apiGet(`${apiUrl}/document-signing/trade-document/${documentId}`);
 
         if (!response.ok) {
             if (response.status === 404) {

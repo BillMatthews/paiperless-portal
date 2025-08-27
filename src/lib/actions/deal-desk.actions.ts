@@ -11,7 +11,7 @@ import {
 } from "@/lib/types/deal-desk.types";
 import {DealPromissoryNoteDetails} from "@/lib/types/promissory-note.types";
 import {getChecklistTemplate} from "@/lib/actions/checklist.actions";
-import {apiRequest} from "@/lib/utils";
+import {apiGet, apiPatch, apiPost} from "@/lib/utils/api-client";
 
 const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
 if (!apiUrl) {
@@ -36,9 +36,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
       const queryString = params.toString();
       const url = queryString ? `${apiUrl}/deal-processing?${queryString}` : `${apiUrl}/deal-processing`;
 
-      const response = await apiRequest(url, {
-        method: 'GET',
-      });
+      const response = await apiGet(url);
   
       if (!response.ok) {
         throw new Error(`Failed to fetch deals: ${response.statusText}`);
@@ -130,12 +128,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
   export async function getDealDetails(accountId: string, dealId: string): Promise<DealDetails> {
     try {
-      const response = await fetch(`${apiUrl}/trade-finance/${accountId}/deals/${dealId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await apiGet(`${apiUrl}/trade-finance/${accountId}/deals/${dealId}`);
   
       if (!response.ok) {
         throw new Error(`Failed to fetch deal details: ${response.statusText}`);
@@ -164,7 +157,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
       const url = `${apiUrl}/trade-documents/${accountId}/${documentId}/file/${fileVariant}`;
   
-      const response = await fetch(url);
+      const response = await apiGet(url);
       if (!response.ok) {
         return {
           data: null,
@@ -195,12 +188,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   export async function getInvoiceDealDetails(accountId: string, invoiceIds: string[]): Promise<InvoiceDocument[]> {
     try {
       const promises = invoiceIds.map(async (invoiceId) => {
-        const response = await fetch(`${apiUrl}/trade-documents/${accountId}/${invoiceId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        const response = await apiGet(`${apiUrl}/trade-documents/${accountId}/${invoiceId}`);
   
         if (!response.ok) {
           throw new Error(`Failed to fetch invoice details for ${invoiceId}: ${response.statusText}`);
@@ -232,12 +220,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
   export async function getDealAccountDetails(accountId: string): Promise<AccountDetails> {
     try {
-      const response = await fetch(`${apiUrl}/accounts/${accountId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await apiGet(`${apiUrl}/accounts/${accountId}`);
   
       if (!response.ok) {
         throw new Error(`Failed to fetch account details: ${response.statusText}`);
@@ -257,12 +240,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
   export async function getDealProcessingDetails(dealProcessingId: string): Promise<DealDto | null> {
     try {
-      const response = await fetch(`${apiUrl}/deal-processing/${dealProcessingId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await apiGet(`${apiUrl}/deal-processing/${dealProcessingId}`);
   
       if (!response.ok) {
         if (response.status === 404) {
@@ -287,16 +265,11 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
    */
   export async function updateDealDecision(dealId: string, decision: string, notes: string) {
     try {
-      const response = await fetch(`${apiUrl}/deal-processing/${dealId}/funding-decision`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await apiPost(`${apiUrl}/deal-processing/${dealId}/funding-decision`, JSON.stringify({
           decision,
           note: notes,
-        }),
-      });
+        })
+      );
   
       if (!response.ok) {
         throw new Error(`Failed to update deal decision: ${response.statusText}`);
@@ -316,13 +289,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
     const payload = {...note.content}
 
     try {
-      const response = await fetch(`${apiUrl}/deal-processing/${dealId}/promissory-note`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await apiPatch(`${apiUrl}/deal-processing/${dealId}/promissory-note`, JSON.stringify(payload));
   
       if (!response.ok) {
         throw new Error(`Failed to save promissory note: ${response.statusText}`);
@@ -346,7 +313,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
     try {
       const url = `${apiUrl}/deal-processing/${dealId}/promissory-note/download`
   
-      const response = await fetch(url);
+      const response = await apiGet(url);
       if (!response.ok) {
         return {
           data: null,
@@ -383,7 +350,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
     try {
       const url = `${apiUrl}/deal-processing/${dealId}/promissory-note/download`
   
-      const response = await fetch(url);
+      const response = await apiGet(url);
       if (!response.ok) {
         return {
           buffer: null,
@@ -415,12 +382,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
    */
   export async function issuePromissoryNote(dealId: string) {
     try {
-      const response = await fetch(`${apiUrl}/deal-processing/${dealId}/promissory-note/issue`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await apiPatch(`${apiUrl}/deal-processing/${dealId}/promissory-note/issue`);
   
       if (!response.ok) {
         throw new Error(`Failed to issue promissory note: ${response.statusText}`);
@@ -438,16 +400,11 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
    */
   export async function signPromissoryNote(dealId: string, party: 'lender' | 'borrower', signedBy: string) {
     try {
-      const response = await fetch(`${apiUrl}/deal-processing/${dealId}/promissory-note/sign`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await apiPost(`${apiUrl}/deal-processing/${dealId}/promissory-note/sign`, JSON.stringify({
           party,
           signedBy,
-        }),
-      });
+        })
+      );
   
       if (!response.ok) {
         throw new Error(`Failed to sign promissory note: ${response.statusText}`);
@@ -465,13 +422,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
    */
   export async function updateFundingProgress(dealId: string, progress: Omit<FundingProgress, 'timestamp'>) {
     try {
-      const response = await fetch(`${apiUrl}/deal-processing/${dealId}/funding-progress`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(progress),
-      });
+      const response = await apiPost(`${apiUrl}/deal-processing/${dealId}/funding-progress`, JSON.stringify(progress));
   
       if (!response.ok) {
         throw new Error(`Failed to update funding progress: ${response.statusText}`);
@@ -498,13 +449,7 @@ export async function updateDealDueDiligenceChecklist(dealId: string, updates: A
   }>;
 }>) {
   try {
-    const response = await fetch(`${apiUrl}/deal-processing/${dealId}/checklist`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updates),
-    });
+    const response = await apiPatch(`${apiUrl}/deal-processing/${dealId}/checklist`, JSON.stringify(updates));
 
     if (!response.ok) {
       throw new Error(`Failed to update checklist: ${response.statusText}`);

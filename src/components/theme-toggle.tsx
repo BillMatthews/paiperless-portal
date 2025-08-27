@@ -22,7 +22,7 @@ export function ThemeToggle() {
   if (!mounted) return null
 
   const icon =
-    resolvedTheme === "dark" ? <Moon className="h-4 w-4" /> : resolvedTheme === "light" ? <Sun className="h-4 w-4" /> : <Laptop className="h-4 w-4" />
+    resolvedTheme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />
 
   return (
     <DropdownMenu>
@@ -46,12 +46,6 @@ export function ThemeToggle() {
           className="flex items-center px-2 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer"
         >
           <Moon className="mr-2 h-4 w-4" /> Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onSelect={() => setTheme("system")}
-          className="flex items-center px-2 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer"
-        >
-          <Laptop className="mr-2 h-4 w-4" /> System
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

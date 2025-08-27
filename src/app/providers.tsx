@@ -24,8 +24,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <Web3ModalProvider config={wagmiConfig}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
           disableTransitionOnChange
         >
           <PermissionsProvider>

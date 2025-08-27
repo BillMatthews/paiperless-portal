@@ -1,17 +1,15 @@
 "use server"
 
-import { apiRequest } from "@/lib/utils";
+import {apiGet, apiPatch} from "@/lib/utils/api-client";
 
-const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
+const apiUrl = process.env.TRADE_DOCUMENTS_API_URL || 'http://localhost:3001/api';
 if (!apiUrl) {
   throw new Error('TRADE_DOCUMENTS_API_URL environment variable is not set');
 }
 
 export async function getChecklistTemplate(versionNumber: number) {
     try {
-        const response = await apiRequest(`${apiUrl}/due-diligence-checklists/${versionNumber}`, {
-            method: 'GET',
-        });
+        const response = await apiGet(`${apiUrl}/due-diligence-checklists/${versionNumber}`);
 
         if (!response.ok) {
             if (response.status === 404) {
@@ -41,10 +39,7 @@ export async function updateDueDiligenceChecklist(checklistInstanceId: string, u
 }>) {
   console.log(JSON.stringify(updates, null, 2));
   try {
-    const response = await apiRequest(`${apiUrl}/due-diligence-checklists/${checklistInstanceId}/checklist`, {
-      method: 'PATCH',
-      body: JSON.stringify(updates),
-    });
+    const response = await apiPatch(`${apiUrl}/due-diligence-checklists/${checklistInstanceId}/checklist`, JSON.stringify(updates));
 
     if (!response.ok) {
       throw new Error(`Failed to update checklist: ${response.statusText}`);

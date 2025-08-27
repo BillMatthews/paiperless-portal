@@ -26,7 +26,7 @@ async function attemptTokenRefresh(): Promise<string | null> {
       return null
     }
 
-    const response = await fetch(`${process.env.TRADE_DOC_API_URL}/auth/refresh`, {
+    const response = await fetch(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: token.refreshToken }),
@@ -79,9 +79,17 @@ export async function apiClient(
     }
   }
 
-  // Prepare headers
+  // Get the API Key
+  const apiKey = process.env.APP_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('APP_API_KEY environment variable is not set');
+  }
+
+  // Prepare default headers
   const requestHeaders: Record<string, string> = {
     "Content-Type": "application/json",
+    'x-api-key': apiKey,
   }
 
   // Add any additional headers

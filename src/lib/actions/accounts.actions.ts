@@ -2,16 +2,11 @@
 
 import {AccountsSearchResponse, SearchOptions} from "@/lib/types/search.types";
 import {AccountDetailsDto, AccountUpdatesDto} from "@/lib/types/accounts.types";
-import { apiRequest } from "@/lib/utils";
+import {apiGet, apiPatch} from "@/lib/utils/api-client";
 
-const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
+const apiUrl = process.env.TRADE_DOCUMENTS_API_URL || 'http://localhost:3001/api';
 
 export async function searchAccounts(options: SearchOptions = {}): Promise<AccountsSearchResponse> {
-    if (!apiUrl) {
-      console.error('TRADE_DOCUMENTS_API_URL environment variable is not set');
-      throw new Error('API configuration is missing. Please check environment variables.');
-    }
-
     try {
       const { queryTerm, page, limit, orderBy, orderDirection } = options;
       
@@ -28,9 +23,7 @@ export async function searchAccounts(options: SearchOptions = {}): Promise<Accou
   
       console.log('Fetching accounts from:', url);
   
-      const response = await apiRequest(url, {
-        method: 'GET',
-      });
+      const response = await apiGet(url);
   
       if (!response.ok) {
         throw new Error(`Failed to fetch accounts: ${response.status} ${response.statusText}`);
@@ -56,10 +49,7 @@ export async function updateAccountDetails(accountId: string, updates: AccountUp
 
     console.log('Updating account:', accountId, 'with updates:', updates);
 
-    const response = await apiRequest(url, {
-      method: 'PATCH',
-      body: JSON.stringify(updates),
-    });
+    const response = await apiPatch(url, JSON.stringify(updates));
 
     if (!response.ok) {
       throw new Error(`Failed to update account: ${response.status} ${response.statusText}`);
@@ -85,10 +75,7 @@ export async function updateAccountStatus(accountId: string, updates: AccountUpd
 
     console.log('Updating account:', accountId, 'with updates:', updates);
 
-    const response = await apiRequest(url, {
-      method: 'PATCH',
-      body: JSON.stringify(updates),
-    });
+    const response = await apiPatch(url,JSON.stringify(updates));
 
     if (!response.ok) {
       throw new Error(`Failed to update account: ${response.status} ${response.statusText}`);
@@ -112,9 +99,7 @@ export async function getAccountDetails(accountId: string): Promise<AccountDetai
   try {
     const url = `${apiUrl}/accounts/${accountId}`
 
-    const response = await apiRequest(url, {
-      method: 'GET',
-    });
+    const response = await apiGet(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch account details: ${response.status} ${response.statusText}`);

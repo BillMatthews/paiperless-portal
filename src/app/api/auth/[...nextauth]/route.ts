@@ -32,7 +32,7 @@ export const auth = NextAuth({
           
           console.log("Calling SIWE API with payload:", payload);
           
-          const res = await fetch(`${process.env.TRADE_DOC_API_URL}/auth/login`, {
+          const res = await fetch(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: payload,
@@ -129,7 +129,7 @@ export const auth = NextAuth({
           
           console.log("Calling Email/Password API with payload:", payload);
           
-          const res = await fetch(`${process.env.TRADE_DOC_API_URL}/auth/login/email`, {
+          const res = await fetch(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/login/email`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: payload,

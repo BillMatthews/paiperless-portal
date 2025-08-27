@@ -20,12 +20,7 @@ export default function LoginPage() {
     const [showPasswordReset, setShowPasswordReset] = useState<boolean>(false);
     const [passwordResetEmail, setPasswordResetEmail] = useState<string>('');
 
-    // Redirect if already authenticated
-    React.useEffect(() => {
-        if (status === "authenticated" && session) {
-            router.push("/dashboard");
-        }
-    }, [status, session, router]);
+    // Note: AuthGuard will handle redirects for authenticated users
 
     const handleSiweSuccess = () => {
         // NextAuth will handle the redirect automatically

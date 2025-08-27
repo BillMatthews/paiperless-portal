@@ -2,7 +2,8 @@
 import {OnboardingsSearchResponse, SearchOptions} from "@/lib/types/search.types";
 import {OnboardingDecisionState, OnboardingDto, OnboardingResponse} from "@/lib/types/onboarding.types";
 import {RegistrationDetails} from "@/lib/types/registration.types";
-import { apiRequest } from "@/lib/utils";
+import {apiGet, apiPost} from "@/lib/utils/api-client";
+
 
 
 const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
@@ -24,9 +25,7 @@ export async function getOnboardings(options: SearchOptions = {}): Promise<Onboa
         const queryString = params.toString();
         const url = queryString ? `${apiUrl}/onboarding?${queryString}` : `${apiUrl}/onboarding`;
 
-        const response = await apiRequest(url, {
-            method: 'GET',
-        });
+        const response = await apiGet(url);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch deals: ${response.statusText}`);
@@ -43,12 +42,7 @@ export async function getOnboardings(options: SearchOptions = {}): Promise<Onboa
 
 export async function getOnboardingDetails(registrationId: string): Promise<OnboardingDto> {
     try {
-        const response = await fetch(`${apiUrl}/onboarding/${registrationId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await apiGet(`${apiUrl}/onboarding/${registrationId}`);
 
         if (!response.ok) {
             if (response.status === 404) {
@@ -65,12 +59,7 @@ export async function getOnboardingDetails(registrationId: string): Promise<Onbo
 }
 export async function getRegistrationDetails(registrationId: string): Promise<RegistrationDetails> {
     try {
-        const response = await fetch(`${apiUrl}/registration/${registrationId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await apiGet(`${apiUrl}/registration/${registrationId}`);
 
         if (!response.ok) {
             if (response.status === 404) {
@@ -95,7 +84,7 @@ export async function getRegistrationDocumentFileDataUrl(registrationId: string,
 
         const url = `${apiUrl}/registration/${registrationId}/files/${documentId}`;
 
-        const response = await fetch(url);
+        const response = await apiGet(url);
         if (!response.ok) {
             return {
                 data: null,
@@ -146,16 +135,11 @@ export async function getOnboarding(id: string): Promise<OnboardingResponse> {
 
 export async function updateOnboardingDecision(onboardingId: string, decision: OnboardingDecisionState, notes: string) {
     try {
-        const response = await fetch(`${apiUrl}/onboarding/${onboardingId}/decision`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+        const response = await apiPost(`${apiUrl}/onboarding/${onboardingId}/decision`, JSON.stringify({
                 decision,
                 note: notes,
             }),
-        });
+        );
 
         if (!response.ok) {
             throw new Error(`Failed to update deal decision: ${response.statusText}`);

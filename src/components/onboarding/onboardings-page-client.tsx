@@ -47,7 +47,7 @@ export function OnboardingsPageClient({initialOnboardings, initialMetadata}: Onb
         if (newOptions.orderDirection) params.set('orderDirection', newOptions.orderDirection);
 
         const queryString = params.toString();
-        const newUrl = queryString ? `/dashboard/onboarding?${queryString}` : '/dashboard/onboarding';
+        const newUrl = queryString ? `/onboarding?${queryString}` : '/onboarding';
         router.push(newUrl);
     };
 

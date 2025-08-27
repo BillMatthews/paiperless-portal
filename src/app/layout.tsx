@@ -4,7 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import {Providers} from "@/app/providers";
+import { Providers } from "@/app/providers";
+import { AuthGuard } from "@/components/auth-guard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,23 +27,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const appLayout = (
+    <div className="flex min-h-screen bg-background text-foreground">
+      <Sidebar />
+      <div className="flex-1 p-8 relative">
+        <div className="absolute top-4 right-4 z-10">
+          <ThemeToggle />
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          {/*<ThemeProvider attribute="class" defaultTheme="system" enableSystem>*/}
-          {/*  <div className="flex min-h-screen bg-background text-foreground">*/}
-          {/*    <Sidebar />*/}
-          {/*    <div className="flex-1 p-8 relative">*/}
-          {/*      <div className="absolute top-4 right-4 z-10">*/}
-          {/*        <ThemeToggle />*/}
-          {/*      </div>*/}
-                {children}
-          {/*    </div>*/}
-          {/*  </div>*/}
-          {/*</ThemeProvider>*/}
+          <AuthGuard appLayout={appLayout}>
+            {children}
+          </AuthGuard>
         </Providers>
       </body>
     </html>
