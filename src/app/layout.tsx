@@ -4,7 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Providers } from "@/components/providers";
+import {Providers} from "@/app/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,17 +32,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="flex min-h-screen bg-background text-foreground">
-              <Sidebar />
-              <div className="flex-1 p-8 relative">
-                <div className="absolute top-4 right-4 z-10">
-                  <ThemeToggle />
-                </div>
+          {/*<ThemeProvider attribute="class" defaultTheme="system" enableSystem>*/}
+          {/*  <div className="flex min-h-screen bg-background text-foreground">*/}
+          {/*    <Sidebar />*/}
+          {/*    <div className="flex-1 p-8 relative">*/}
+          {/*      <div className="absolute top-4 right-4 z-10">*/}
+          {/*        <ThemeToggle />*/}
+          {/*      </div>*/}
                 {children}
-              </div>
-            </div>
-          </ThemeProvider>
+          {/*    </div>*/}
+          {/*  </div>*/}
+          {/*</ThemeProvider>*/}
         </Providers>
       </body>
     </html>

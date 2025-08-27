@@ -18,15 +18,17 @@ Open [http://localhost:3002](http://localhost:3002) with your browser to see the
 
 # ToDo:
 1. Need to integrate authentication
-    * SIWE
-2. Authorisation - Future?
+    * SIWE ?
+2. Authorisation
     * Add guards to features to ensure only specific users can access features.
 3. Deal Desk
    * Decision tab is not displaying the list of decisions
-   * Promissory Note: Signing
-     * Need a Block Explorer link for the signing event - we may need to store additional information such as the transaction
    * Funding Progress tracker
 4. Account User Management
    * Add feature to manage Account Users for the Voy Account
-5. Future -> Checklist Management
-6. Future -> Manage Application API keys   Generate new Keys
+5. Add tests
+6. Align status fields across front and back-end
+
+## Future
+1. Checklist Management
+2. Manage Application API keys - Generate new Keys etc.
