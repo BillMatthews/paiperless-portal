@@ -12,6 +12,7 @@ import {
 import {DealPromissoryNoteDetails} from "@/lib/types/promissory-note.types";
 import {getChecklistTemplate} from "@/lib/actions/checklist.actions";
 import {apiGet, apiPatch, apiPost} from "@/lib/utils/api-client";
+import { handleServerActionError } from "@/lib/utils/error-handler";
 
 const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
 if (!apiUrl) {
@@ -44,8 +45,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
 
     return await response.json();
     } catch (error) {
-      console.error('Error fetching deals:', error);
-      throw error;
+      return await handleServerActionError(error, 'getDeals');
     }
   }
   
@@ -121,8 +121,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
         invoiceDocuments
       };
     } catch (error) {
-      console.error('Error fetching complete deal details:', error);
-      throw error;
+      return await handleServerActionError(error, 'getDeal');
     }
   }
   
@@ -141,8 +140,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
         updatedAt: new Date(data.updatedAt)
       };
     } catch (error) {
-      console.error('Error fetching deal details:', error);
-      throw error;
+      return await handleServerActionError(error, 'getDealDetails');
     }
   }
 
@@ -213,8 +211,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
       return await Promise.all(promises);
     } catch (error) {
-      console.error('Error fetching invoice details:', error);
-      throw error;
+      return await handleServerActionError(error, 'getInvoiceDealDetails');
     }
   }
   
@@ -233,8 +230,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
         updatedAt: new Date(data.updatedAt)
       };
     } catch (error) {
-      console.error('Error fetching account details:', error);
-      throw error;
+      return await handleServerActionError(error, 'getDealAccountDetails');
     }
   }
   
@@ -254,8 +250,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
       console.log(JSON.stringify(data, null, 2));
       return data;
     } catch (error) {
-      console.error('Error fetching deal:', error);
-      throw error;
+      return await handleServerActionError(error, 'getDealProcessingDetails');
     }
   }
 
@@ -277,8 +272,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
       return { success: true };
     } catch (error) {
-      console.error('Error updating deal decision:', error);
-      throw error;
+      return await handleServerActionError(error, 'updateDealDecision');
     }
   }
   
@@ -297,8 +291,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
       return { success: true };
     } catch (error) {
-      console.error('Error saving promissory note:', error);
-      throw error;
+      return await handleServerActionError(error, 'savePromissoryNote');
     }
   }
   
@@ -390,8 +383,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
       return { success: true };
     } catch (error) {
-      console.error('Error issuing promissory note:', error);
-      throw error;
+      return await handleServerActionError(error, 'issuePromissoryNote');
     }
   }
   
@@ -412,8 +404,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
       return { success: true };
     } catch (error) {
-      console.error('Error signing promissory note:', error);
-      throw error;
+      return await handleServerActionError(error, 'signPromissoryNote');
     }
   }
 
@@ -430,8 +421,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
   
       return { success: true };
     } catch (error) {
-      console.error('Error updating funding progress:', error);
-      throw error;
+      return await handleServerActionError(error, 'updateFundingProgress');
     }
   }
 
@@ -457,7 +447,6 @@ export async function updateDealDueDiligenceChecklist(dealId: string, updates: A
 
     return {success: true};
   } catch (error) {
-    console.error('Error updating checklist:', error);
-    throw error;
+    return await handleServerActionError(error, 'updateDueDiligenceChecklist');
   }
 }

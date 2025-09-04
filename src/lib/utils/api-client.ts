@@ -1,5 +1,6 @@
 import { getToken } from "next-auth/jwt"
 import { cookies } from "next/headers"
+import { createApiError, ForbiddenError } from "@/lib/errors/api-errors"
 
 interface ApiClientOptions extends RequestInit {
   requireAuth?: boolean
@@ -14,7 +15,7 @@ interface RefreshResponse {
 /**
  * Attempts to refresh the access token using the refresh token
  */
-async function attemptTokenRefresh(): Promise<string | null> {
+async function attemptTokenRefresh(apiKey: string): Promise<string | null> {
   try {
     const token = await getToken({ 
       req: { cookies: await cookies() } as any,
@@ -28,7 +29,8 @@ async function attemptTokenRefresh(): Promise<string | null> {
 
     const response = await fetch(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/refresh`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" ,
+          'x-api-key': apiKey},
       body: JSON.stringify({ refreshToken: token.refreshToken }),
     })
 
@@ -112,7 +114,7 @@ export async function apiClient(
   if (response.status === 401 && retryOnAuthFailure && requireAuth) {
     console.log("Received 401, attempting token refresh...")
     
-    const newAccessToken = await attemptTokenRefresh()
+    const newAccessToken = await attemptTokenRefresh(apiKey)
     
     if (newAccessToken) {
       console.log("Token refresh successful, retrying original request...")
@@ -120,7 +122,8 @@ export async function apiClient(
       // Update headers with new token
       const retryHeaders: Record<string, string> = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${newAccessToken}`
+        Authorization: `Bearer ${newAccessToken}`,
+          'x-api-key': apiKey,
       }
       
       // Add any additional headers if they exist
@@ -136,6 +139,17 @@ export async function apiClient(
     } else {
       console.warn("Token refresh failed, returning original 401 response")
     }
+  }
+
+  // Handle error responses by throwing appropriate errors
+  if (!response.ok) {
+    // For 403 errors, throw a specific ForbiddenError
+    if (response.status === 403) {
+      throw new ForbiddenError('Access forbidden - insufficient permissions', response)
+    }
+    
+    // For other error statuses, create appropriate API errors
+    throw createApiError(response)
   }
 
   return response
@@ -263,6 +277,17 @@ export async function apiFormData(url: string, formData: FormData, options: ApiC
     } else {
       console.warn("Token refresh failed, returning original 401 response")
     }
+  }
+
+  // Handle error responses by throwing appropriate errors
+  if (!response.ok) {
+    // For 403 errors, throw a specific ForbiddenError
+    if (response.status === 403) {
+      throw new ForbiddenError('Access forbidden - insufficient permissions', response)
+    }
+    
+    // For other error statuses, create appropriate API errors
+    throw createApiError(response)
   }
 
   return response

@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { AuthResponseBody, EmailLoginResponse } from "@/lib/types/authentication.types"
+import {apiPost} from "@/lib/utils/api-client";
 
 export const auth = NextAuth({
   providers: [
@@ -32,11 +33,7 @@ export const auth = NextAuth({
           
           console.log("Calling SIWE API with payload:", payload);
           
-          const res = await fetch(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: payload,
-          })
+          const res = await apiPost(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/login`, payload)
           
           const data = await res.json() as AuthResponseBody
           console.log("SIWE API response:", JSON.stringify(data, null, 2));
@@ -85,13 +82,13 @@ export const auth = NextAuth({
         walletAddress: { label: "Wallet Address", type: "text" }
       },
       async authorize(credentials) {
-        console.log("NextAuth Email/Password authorize called with credentials:", {
-          email: credentials?.email ? "present" : "missing",
-          password: credentials?.password ? "present" : "missing",
-          userId: credentials?.userId || "missing",
-          mfaVerified: credentials?.mfaVerified || "missing"
-        });
-        
+        // console.log("NextAuth Email/Password authorize called with credentials:", {
+        //   email: credentials?.email ? "present" : "missing",
+        //   password: credentials?.password ? "present" : "missing",
+        //   userId: credentials?.userId || "missing",
+        //   mfaVerified: credentials?.mfaVerified || "missing"
+        // });
+        //
         // If MFA is already verified, we have the user ID
         if (credentials?.userId && credentials?.mfaVerified === 'true') {
           // User has already been authenticated and MFA verified
@@ -122,37 +119,45 @@ export const auth = NextAuth({
         }
 
         try {
-          const payload = JSON.stringify({ 
+          const payload = {
             email: credentials.email, 
             password: credentials.password 
-          })
+          }
           
           console.log("Calling Email/Password API with payload:", payload);
           
-          const res = await fetch(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/login/email`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: payload,
-          })
+          const res = await apiPost(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/login/email`, payload)
           
           const data = await res.json() as EmailLoginResponse
+          console.log(data);
           console.log("Email/Password API response:", JSON.stringify(data, null, 2));
           
           if (data.success) {
-                      const user = {
-            id: data.userId,
-            userId: data.userId,
-            accountId: data.accountId,
-            accountName: data.accountName,
-            accountEmail: data.accountEmail,
-            walletAddress: data.walletAddress,
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
-            authMethod: 'email-password' as const,
-            mfaRequired: data.mfaRequired,
-            mfaSetupRequired: data.mfaSetupRequired,
-            permissions: data.permissions,
-          };
+            // Check if MFA is required
+            if (data.mfaRequired) {
+              // Throw a custom error that NextAuth will handle
+              // This allows us to pass MFA requirement information to the client
+              const mfaError = new Error(`MFA_REQUIRED:${data.userId}:${data.mfaSetupRequired || false}`);
+              (mfaError as any).code = 'MFA_REQUIRED';
+              (mfaError as any).userId = data.userId;
+              (mfaError as any).mfaSetupRequired = data.mfaSetupRequired || false;
+              throw mfaError;
+            }
+            
+            const user = {
+              id: data.userId,
+              userId: data.userId,
+              accountId: data.accountId,
+              accountName: data.accountName,
+              accountEmail: data.accountEmail,
+              walletAddress: data.walletAddress,
+              accessToken: data.accessToken,
+              refreshToken: data.refreshToken,
+              authMethod: 'email-password' as const,
+              mfaRequired: false,
+              mfaSetupRequired: false,
+              permissions: data.permissions,
+            };
             console.log("Returning Email/Password user:", JSON.stringify(user, null, 2));
             return user;
           }

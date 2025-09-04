@@ -17,17 +17,16 @@ bun dev
 Open [http://localhost:3002](http://localhost:3002) with your browser to see the result.
 
 # ToDo:
-1. Need to integrate authentication
-    * SIWE ?
-2. Authorisation
+1. Authorisation
     * Add guards to features to ensure only specific users can access features.
-3. Deal Desk
+2. Deal Desk
    * Decision tab is not displaying the list of decisions
-   * Funding Progress tracker
-4. Account User Management
-   * Add feature to manage Account Users for the Voy Account
-5. Add tests
-6. Align status fields across front and back-end
+   * Funding Progress tracker - check if this is working
+3. Add RBAC to Server Actions
+4. Add tests
+5. User Documentation or demo video of end-to-end processes
+6. Test end-to-end processes
+
 
 ## Future
 1. Checklist Management

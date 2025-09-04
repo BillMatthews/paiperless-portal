@@ -7,18 +7,22 @@ import { LogOut } from "lucide-react";
 import {UserCheck, Handshake, LayoutDashboard, Users, Building2, Menu, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
+import Image from "next/image";
+import {EntityType, RbacAction} from "@/lib/rbac";
+import {useRbac} from '@/hooks/use-rbac';
 
 const navItems = [
   { href: "/", title: "Home", icon: LayoutDashboard },
-  { href: "/deal-desk", title: "Deal Desk", icon: Handshake},
-  { href: "/onboarding", title: "Onboarding", icon:  UserCheck},
-  { href: "/customer-accounts", title: "Customer Accounts", icon: Building2},
-  { href: "/user-management", title: "User Management", icon:  Users},
+  { href: "/deal-desk", title: "Deal Desk", icon: Handshake, requiredAction: {entity: EntityType.TRADE_FINANCE_DEAL, action: RbacAction.READ}},
+  { href: "/onboarding", title: "Onboarding", icon:  UserCheck, requiredAction: {entity: EntityType.ONBOARDING_REQUEST, action: RbacAction.READ}},
+  { href: "/customer-accounts", title: "Customer Accounts", icon: Building2, requiredAction: {entity: EntityType.ACCOUNT_MANAGEMENT, action: RbacAction.READ}},
+  { href: "/user-management", title: "User Management", icon:  Users, requiredAction: {entity: EntityType.USER_MANAGEMENT, action: RbacAction.READ}},
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const {canPerformAction} = useRbac();
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/login' });
@@ -59,12 +63,26 @@ export function Sidebar() {
                 )}
             >
                 <div className="flex flex-col h-[calc(100%-3.5rem)]">
+                    {/* Logo Section */}
+                    <div className="p-4">
+                        <div className="flex items-center justify-center">
+                            <Image
+                                src="/paiperless-logo-horizontal.png"
+                                alt="Paperless Logo"
+                                width={180}
+                                height={40}
+                                className="h-8 w-auto object-contain"
+                                priority
+                            />
+                        </div>
+                    </div>
+                    
                     <nav className="flex-1 space-y-1 p-4">
                         {navItems.map((item) => {
                             // Check if user has permission to see this navigation item
-                            // if (item.requiredAction && !canPerformAction(item.requiredAction.entity, item.requiredAction.action)) {
-                            //     return null; // Don't render this navigation item
-                            // }
+                            if (item.requiredAction && !canPerformAction(item.requiredAction.entity, item.requiredAction.action)) {
+                                return null; // Don't render this navigation item
+                            }
 
                             return (
                                 <Link
@@ -84,9 +102,6 @@ export function Sidebar() {
 
                     {session && (
                         <div className="mt-auto border-t pt-4">
-                            <div className="px-4 py-2 text-sm text-muted-foreground">
-                                Signed in as: {session.user?.email || 'User'}
-                            </div>
                             <button
                                 onClick={handleSignOut}
                                 className="w-full px-4 py-2 text-left text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors flex items-center gap-2"

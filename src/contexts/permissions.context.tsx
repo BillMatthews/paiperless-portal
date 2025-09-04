@@ -40,7 +40,7 @@ export function PermissionsProvider({ children }: PermissionsProviderProps) {
   }, [session, status]);
 
   const hasPermission = (module: string, role: string): boolean => {
-    console.log("context permissions", JSON.stringify(permissions, null, 2));
+    //console.log("context permissions", JSON.stringify(permissions, null, 2));
     return permissions.some(permission => 
       permission.module === module && permission.role === role
     );

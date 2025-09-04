@@ -2,6 +2,7 @@
 
 import {SigningEventDetailsDto} from "@/lib/types/document-signing.types";
 import {apiGet} from "@/lib/utils/api-client";
+import { handleServerActionError } from "@/lib/utils/error-handler";
 
 
 const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
@@ -26,8 +27,7 @@ export async function getDocumentSigningEventDetails(signingEventId: string): Pr
         console.log(JSON.stringify(data, null, 2));
         return data;
     } catch (error) {
-        console.error('Error fetching deal:', error);
-        throw error;
+        return await handleServerActionError(error, 'getDocumentSigningEventDetails');
     }
 }
 
@@ -46,7 +46,6 @@ export async function getDocumentSigningEventDetailsByDocumentId(documentId: str
         console.log(JSON.stringify(data, null, 2));
         return data;
     } catch (error) {
-        console.error('Error fetching deal:', error);
-        throw error;
+        return await handleServerActionError(error, 'getDocumentSigningEventDetailsByDocumentId');
     }
 }

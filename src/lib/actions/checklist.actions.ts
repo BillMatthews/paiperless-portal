@@ -1,6 +1,7 @@
 "use server"
 
 import {apiGet, apiPatch} from "@/lib/utils/api-client";
+import { handleServerActionError } from "@/lib/utils/error-handler";
 
 const apiUrl = process.env.TRADE_DOCUMENTS_API_URL || 'http://localhost:3001/api';
 if (!apiUrl) {
@@ -20,8 +21,7 @@ export async function getChecklistTemplate(versionNumber: number) {
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching deal:', error);
-        throw error;
+        return await handleServerActionError(error, 'getChecklistTemplate');
     }
 }
 
@@ -47,7 +47,6 @@ export async function updateDueDiligenceChecklist(checklistInstanceId: string, u
 
     return {success: true};
   } catch (error) {
-    console.error('Error updating checklist:', error);
-    throw error;
+    return await handleServerActionError(error, 'updateDueDiligenceChecklist');
   }
 }

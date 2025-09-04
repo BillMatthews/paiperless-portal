@@ -19,6 +19,7 @@ import {
   ApiErrorResponse 
 } from '@/lib/types/authentication.types';
 import { apiPost } from "@/lib/utils/api-client";
+import { handleServerActionErrorWithFallback } from "@/lib/utils/error-handler";
 
 // API base URL - should come from environment variables
 const API_BASE_URL = process.env.TRADE_DOCUMENTS_API_URL || 'http://localhost:3001/api';
@@ -64,11 +65,14 @@ export async function changePassword(
       };
     }
 
-    console.error('Password change error:', error);
-    return {
-      success: false,
-      error: 'An unexpected error occurred while changing password',
-    };
+    return handleServerActionErrorWithFallback(
+      error,
+      {
+        success: false,
+        error: 'An unexpected error occurred while changing password',
+      },
+      "changePassword"
+    );
   }
 }
 
@@ -112,11 +116,14 @@ export async function forgotPassword(
       };
     }
 
-    console.error('Forgot password error:', error);
-    return {
-      success: false,
-      error: 'An unexpected error occurred while sending password reset email',
-    };
+    return handleServerActionErrorWithFallback(
+      error,
+      {
+        success: false,
+        error: 'An unexpected error occurred while sending password reset email',
+      },
+      "forgotPassword"
+    );
   }
 }
 
@@ -161,11 +168,14 @@ export async function resetPassword(
       };
     }
 
-    console.error('Password reset error:', error);
-    return {
-      success: false,
-      error: 'An unexpected error occurred while resetting password',
-    };
+    return handleServerActionErrorWithFallback(
+      error,
+      {
+        success: false,
+        error: 'An unexpected error occurred while resetting password',
+      },
+      "resetPassword"
+    );
   }
 }
 
@@ -212,11 +222,14 @@ export async function forcedPasswordReset(
       };
     }
 
-    console.error('Forced password reset error:', error);
-    return {
-      success: false,
-      error: 'An unexpected error occurred while resetting password',
-    };
+    return handleServerActionErrorWithFallback(
+      error,
+      {
+        success: false,
+        error: 'An unexpected error occurred while resetting password',
+      },
+      "forcedPasswordReset"
+    );
   }
 }
 
@@ -263,11 +276,14 @@ export async function adminForcedPasswordReset(
       };
     }
 
-    console.error('Admin forced password reset error:', error);
-    return {
-      success: false,
-      error: 'An unexpected error occurred while forcing password reset',
-    };
+    return handleServerActionErrorWithFallback(
+      error,
+      {
+        success: false,
+        error: 'An unexpected error occurred while forcing password reset',
+      },
+      "adminForcedPasswordReset"
+    );
   }
 }
 

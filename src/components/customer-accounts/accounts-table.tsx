@@ -1,27 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { AccountStatusBadge } from "@/components/customer-accounts/account-status-badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatDistanceToNow } from "date-fns";
+import {useState} from "react";
+import {AccountStatusBadge} from "@/components/customer-accounts/account-status-badge";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {formatDistanceToNow} from "date-fns";
 import Link from "next/link";
-import { 
-  ChevronDown, 
-  ChevronUp,
-  EyeIcon,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { AccountsSummaryDto } from "@/lib/types/accounts.types";
-import { SearchMetadata } from "@/lib/types/search.types";
+import {ChevronDown, ChevronLeft, ChevronRight, ChevronUp, EyeIcon,} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {AccountsSummaryDto} from "@/lib/types/accounts.types";
+import {SearchMetadata} from "@/lib/types/search.types";
+import {ActionPermissions, EntityType, RbacAction} from "@/lib/rbac/permissions.types";
+import {useRbac} from "@/hooks/use-rbac";
 
 interface AccountsTableProps {
   accounts: AccountsSummaryDto[];
@@ -45,7 +34,7 @@ export function AccountsTable({ accounts, metadata, onPageChange, isLoading }: A
       setSortDirection("asc");
     }
   };
-  
+
   const sortedAccounts = [...accounts].sort((a, b) => {
     let comparison = 0;
     

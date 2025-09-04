@@ -3,6 +3,7 @@
 import {AccountsSearchResponse, SearchOptions} from "@/lib/types/search.types";
 import {AccountDetailsDto, AccountUpdatesDto} from "@/lib/types/accounts.types";
 import {apiGet, apiPatch} from "@/lib/utils/api-client";
+import { handleServerActionError } from "@/lib/utils/error-handler";
 
 const apiUrl = process.env.TRADE_DOCUMENTS_API_URL || 'http://localhost:3001/api';
 
@@ -33,8 +34,7 @@ export async function searchAccounts(options: SearchOptions = {}): Promise<Accou
       console.log('Accounts response:', JSON.stringify(data, null, 2));
       return data;
     } catch (error) {
-      console.error('Error fetching accounts:', error);
-      throw error;
+      return await handleServerActionError(error, 'searchAccounts');
     }
   }
 
@@ -59,8 +59,7 @@ export async function updateAccountDetails(accountId: string, updates: AccountUp
     console.log('Account update response:', JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
-    console.error('Error updating account:', error);
-    throw error;
+    return await handleServerActionError(error, 'updateAccountDetails');
   }
 }
 
@@ -85,8 +84,7 @@ export async function updateAccountStatus(accountId: string, updates: AccountUpd
     console.log('Account update response:', JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
-    console.error('Error updating account:', error);
-    throw error;
+    return await handleServerActionError(error, 'updateAccountStatus');
   }
 }
 
@@ -109,7 +107,6 @@ export async function getAccountDetails(accountId: string): Promise<AccountDetai
     console.log(JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
-    console.error('Error fetching account details:', error);
-    throw error;
+    return await handleServerActionError(error, 'getAccountDetails');
   }
 }

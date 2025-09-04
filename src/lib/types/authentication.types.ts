@@ -178,9 +178,9 @@ export interface CreateUserResponse {
 
 // User Permission Types
 export enum ApplicationModule {
-    PAIPERLESS_TRADE_DOCUMENTS = 'Paiperless-Trade-Documents',
-    PAIPERLESS_TRADE_FINANCE = 'Paiperless-Trade-Finance',
-    PAIPERLESS_ADMIN = 'Paiperless-Admin',
+    PORTAL_DEAL_DESK = 'Portal-DealDesk',
+    PORTAL_ONBOARDING_DESK = 'Portal-OnboardingDesk',
+    PORTAL_ADMIN = 'Portal-Admin',
 }
 
 
@@ -198,3 +198,5 @@ export interface UserPermission {
 
 // Authentication Method Type
 export type AuthMethod = 'siwe' | 'email-password';
+
+

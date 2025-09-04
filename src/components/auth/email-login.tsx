@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { authenticateEmailPassword} from '@/lib/actions/nextauth.actions';
+
 import Link from 'next/link';
 
 interface EmailLoginProps {
@@ -48,30 +48,7 @@ export function EmailLogin({
         return;
       }
 
-      // Call the email/password authentication API
-      const response = await authenticateEmailPassword(email, password);
-      
-      if (!response.success) {
-        const errorMessage = response.message || 'Authentication failed. Please check your credentials.';
-        setError(errorMessage);
-        onError?.(errorMessage);
-        toast.error(errorMessage);
-        return;
-      }
-
-      // Check if MFA is required
-      if (response.mfaRequired) {
-        onMfaRequired?.(response.userId, response.mfaSetupRequired || false);
-        return;
-      }
-
-      // Check if password reset is required
-      if (response.passwordResetRequired) {
-        onPasswordResetRequired?.(email);
-        return;
-      }
-
-      // If no MFA required, proceed with NextAuth signIn
+      // Go straight to NextAuth signIn - no pre-validation API call
       const result = await signIn('email-password', {
         email,
         password,
@@ -79,6 +56,17 @@ export function EmailLogin({
       });
 
       if (result?.error) {
+        // Check if this is an MFA requirement error
+        if (result.error.startsWith('MFA_REQUIRED:')) {
+          // Parse the MFA requirement error
+          const [, userId, mfaSetupRequired] = result.error.split(':');
+          console.log("MFA required for user:", userId, "setup required:", mfaSetupRequired);
+          
+          // Trigger the MFA flow
+          onMfaRequired?.(userId, mfaSetupRequired === 'true');
+          return;
+        }
+        
         const errorMessage = 'Authentication failed. Please try again.';
         setError(errorMessage);
         onError?.(errorMessage);

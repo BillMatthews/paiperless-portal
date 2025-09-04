@@ -3,6 +3,7 @@ import {OnboardingsSearchResponse, SearchOptions} from "@/lib/types/search.types
 import {OnboardingDecisionState, OnboardingDto, OnboardingResponse} from "@/lib/types/onboarding.types";
 import {RegistrationDetails} from "@/lib/types/registration.types";
 import {apiGet, apiPost} from "@/lib/utils/api-client";
+import { handleServerActionError, handleServerActionErrorWithFallback } from "@/lib/utils/error-handler";
 
 
 
@@ -10,6 +11,7 @@ const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
 if (!apiUrl) {
     throw new Error('TRADE_DOCUMENTS_API_URL environment variable is not set');
 }
+
 export async function getOnboardings(options: SearchOptions = {}): Promise<OnboardingsSearchResponse> {
     try {
         const {queryTerm, page, limit, orderBy, orderDirection} = options;
@@ -26,17 +28,10 @@ export async function getOnboardings(options: SearchOptions = {}): Promise<Onboa
         const url = queryString ? `${apiUrl}/onboarding?${queryString}` : `${apiUrl}/onboarding`;
 
         const response = await apiGet(url);
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch deals: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log(JSON.stringify(data, null, 2));
-        return data;
+        return await response.json();
     } catch (error) {
-        console.error('Error fetching deals:', error);
-        throw error;
+        return await handleServerActionError(error, 'getOnboardings');
+    
     }
 }
 
@@ -53,8 +48,8 @@ export async function getOnboardingDetails(registrationId: string): Promise<Onbo
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching onboarding details:', error);
-        throw error;
+        return await handleServerActionError(error, 'getOnboardingDetails');
+        
     }
 }
 export async function getRegistrationDetails(registrationId: string): Promise<RegistrationDetails> {
@@ -70,8 +65,8 @@ export async function getRegistrationDetails(registrationId: string): Promise<Re
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching onboarding details:', error);
-        throw error;
+        return await handleServerActionError(error, 'getRegistrationDetails');
+        
     }
 }
 
@@ -103,12 +98,15 @@ export async function getRegistrationDocumentFileDataUrl(registrationId: string,
             contentType,
         };
     } catch (error) {
-        console.error('Error getting document file:', error);
-        return {
-            data: null,
-            contentType: null,
-            error: 'Failed to get document file'
-        };
+        return handleServerActionErrorWithFallback(
+            error, 
+            {
+                data: null,
+                contentType: null,
+                error: 'Failed to get document file'
+            },
+            'getRegistrationDocumentFileDataUrl'
+        );
     }
 }
 
@@ -127,8 +125,7 @@ export async function getOnboarding(id: string): Promise<OnboardingResponse> {
         } as OnboardingResponse
     }
     catch (error) {
-        console.error(`Error fetching onboarding details: ${error}`)
-        throw error;
+        return await handleServerActionError(error, 'getOnboarding');
     }
 
 }
@@ -141,13 +138,14 @@ export async function updateOnboardingDecision(onboardingId: string, decision: O
             }),
         );
 
-        if (!response.ok) {
-            throw new Error(`Failed to update deal decision: ${response.statusText}`);
-        }
-
         return { success: true };
     } catch (error) {
-        console.error('Error updating deal decision:', error);
-        throw error;
+        // For this action, we might want to return a fallback instead of redirecting
+        // This depends on your UX requirements
+        return handleServerActionErrorWithFallback(
+            error, 
+            { success: false, error: 'Failed to update decision' },
+            'updateOnboardingDecision'
+        );
     }
 }
