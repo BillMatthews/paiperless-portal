@@ -25,9 +25,7 @@ interface PromissoryNoteEditorProps {
   processingDetails: DealDto;
 }
 
-export function PromissoryNoteEditor({ 
-  accountDetails, 
-  dealDetails, 
+export function PromissoryNoteEditor({
   processingDetails 
 }: PromissoryNoteEditorProps) {
   const { toast } = useToast();

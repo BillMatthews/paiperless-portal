@@ -61,7 +61,7 @@ export async function changePassword(
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: 'Invalid input data: ' + error.errors.map(e => e.message).join(', '),
+        error: 'Invalid input data: ' + error.issues.map(e => e.message).join(', '),
       };
     }
 
@@ -164,7 +164,7 @@ export async function resetPassword(
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: 'Invalid input data: ' + error.errors.map(e => e.message).join(', '),
+        error: 'Invalid input data: ' + error.issues.map(e => e.message).join(', '),
       };
     }
 
@@ -218,7 +218,7 @@ export async function forcedPasswordReset(
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: 'Invalid input data: ' + error.errors.map(e => e.message).join(', '),
+        error: 'Invalid input data: ' + error.issues.map(e => e.message).join(', '),
       };
     }
 
@@ -272,7 +272,7 @@ export async function adminForcedPasswordReset(
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: 'Invalid input data: ' + error.errors.map(e => e.message).join(', '),
+        error: 'Invalid input data: ' + error.issues.map(e => e.message).join(', '),
       };
     }
 

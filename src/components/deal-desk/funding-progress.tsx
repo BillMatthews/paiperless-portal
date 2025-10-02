@@ -28,9 +28,9 @@ export function FundingProgress({ deal }: FundingProgressProps) {
 
   const getNextStatus = (currentStatus: string): string | null => {
     const statusFlow = {
-      'Ready for Funds Release': 'Funds Released',
-      'Funds Released': 'Loan Repaid',
-      'Loan Repaid': 'Deal Complete'
+      'FUNDING_REQUESTED': 'FUNDS_RELEASED',
+      'FUNDS_RELEASED': 'LOAN_REPAID',
+      'LOAN_REPAID': 'COMPLETED'
     };
     return statusFlow[currentStatus as keyof typeof statusFlow] || null;
   };
@@ -42,7 +42,7 @@ export function FundingProgress({ deal }: FundingProgressProps) {
     try {
       setIsUpdating(true);
       await updateFundingProgress(deal.dealId, {
-        status: nextStatus,
+        status: nextStatus as any,
         amount: amount ? parseFloat(amount) : undefined,
         reference,
         notes,

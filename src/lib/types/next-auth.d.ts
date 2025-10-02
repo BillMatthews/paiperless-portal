@@ -1,4 +1,3 @@
-import NextAuth from "next-auth"
 import { UserPermission } from "./authentication.types"
 
 declare module "next-auth" {

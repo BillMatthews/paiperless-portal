@@ -2,6 +2,7 @@
 
 import { apiGet, apiPost } from "@/lib/utils/api-client";
 import { handleServerActionError, handleServerActionErrorWithFallback } from "@/lib/utils/error-handler";
+import { ForbiddenError } from "@/lib/errors/api-errors";
 
 // Example 1: Redirect on 403, throw other errors
 export async function getData(id: string) {

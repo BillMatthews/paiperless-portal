@@ -10,7 +10,7 @@ import { PermissionsProvider } from "@/contexts/permissions.context";
 
 const queryClient = new QueryClient();
 
-function Web3ModalProvider({ children }:{children:React.ReactNode, initialState?: State}) {
+function Web3ModalProvider({ children }: { children: React.ReactNode }) {
   return (
       <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -21,7 +21,7 @@ function Web3ModalProvider({ children }:{children:React.ReactNode, initialState?
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      <Web3ModalProvider config={wagmiConfig}>
+      <Web3ModalProvider>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

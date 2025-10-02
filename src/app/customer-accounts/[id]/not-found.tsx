@@ -8,7 +8,7 @@ export default function AccountNotFound() {
       <UserX className="h-16 w-16 text-muted-foreground" />
       <h1 className="text-2xl font-bold">Account Not Found</h1>
       <p className="text-muted-foreground text-center max-w-md">
-        The account you're looking for doesn't exist or may have been removed.
+        The account you&apos;re looking for doesn&apos;t exist or may have been removed.
       </p>
       <Button asChild>
         <Link href="/customer-accounts">

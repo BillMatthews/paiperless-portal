@@ -47,6 +47,7 @@ export async function getOnboardingDetails(registrationId: string): Promise<Onbo
         }
 
         return await response.json();
+
     } catch (error) {
         return await handleServerActionError(error, 'getOnboardingDetails');
         
@@ -118,7 +119,7 @@ export async function getOnboarding(id: string): Promise<OnboardingResponse> {
 
         // Get the registration Details
         const registrationDetails = await getRegistrationDetails(processingDetails.registrationId)
-
+        console.log(JSON.stringify(registrationDetails, null, 2));
         return {
             registrationDetails: registrationDetails,
             processingDetails: processingDetails
@@ -132,10 +133,10 @@ export async function getOnboarding(id: string): Promise<OnboardingResponse> {
 
 export async function updateOnboardingDecision(onboardingId: string, decision: OnboardingDecisionState, notes: string) {
     try {
-        const response = await apiPost(`${apiUrl}/onboarding/${onboardingId}/decision`, JSON.stringify({
+        const response = await apiPost(`${apiUrl}/onboarding/${onboardingId}/decision`, {
                 decision,
                 note: notes,
-            }),
+            },
         );
 
         return { success: true };

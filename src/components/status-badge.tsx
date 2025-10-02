@@ -8,8 +8,8 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   const getVariant = (status: string) => {
     if (!status) {return 'secondary'}
     const statusLower = status.toLowerCase();
-    if (statusLower === 'issued') return 'success';
-    if (statusLower === 'in progress') return 'warning';
+    if (statusLower === 'issued') return 'default';
+    if (statusLower === 'in progress') return 'secondary';
     if (statusLower === 'processing') return 'destructive';
     return 'secondary';
   };

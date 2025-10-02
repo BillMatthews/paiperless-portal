@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -24,15 +24,16 @@ export function AccountsPageClient({ initialAccounts, initialMetadata }: Account
   const [metadata, setMetadata] = useState<SearchMetadata>(initialMetadata);
   const [isLoading, setIsLoading] = useState(false);
   const [searchValue, setSearchValue] = useState(searchParams.get('queryTerm') || '');
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   
   // Get current search options from URL
-  const getCurrentSearchOptions = (): SearchOptions => ({
+  const getCurrentSearchOptions = useCallback((): SearchOptions => ({
     queryTerm: searchParams.get('queryTerm') || undefined,
     page: parseInt(searchParams.get('page') || '1'),
     limit: parseInt(searchParams.get('limit') || '10'),
     orderBy: searchParams.get('orderBy') || undefined,
     orderDirection: (searchParams.get('orderDirection') as 'asc' | 'desc') || undefined,
-  });
+  }), [searchParams]);
 
   // Update URL with new search options
   const updateSearchParams = (options: Partial<SearchOptions>) => {
@@ -65,24 +66,19 @@ export function AccountsPageClient({ initialAccounts, initialMetadata }: Account
     }
   };
 
-  // Debounced search handler
-  const debouncedSearch = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout;
-      return (queryTerm: string) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          updateSearchParams({ queryTerm: queryTerm || undefined, page: 1 });
-        }, 300);
-      };
-    })(),
-    []
-  );
-
   // Handle search input
   const handleSearch = (queryTerm: string) => {
     setSearchValue(queryTerm);
-    debouncedSearch(queryTerm);
+    
+    // Clear existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    // Set new timeout
+    searchTimeoutRef.current = setTimeout(() => {
+      updateSearchParams({ queryTerm: queryTerm || undefined, page: 1 });
+    }, 300);
   };
 
   // Handle pagination
@@ -90,11 +86,7 @@ export function AccountsPageClient({ initialAccounts, initialMetadata }: Account
     updateSearchParams({ page });
   };
 
-  // Handle sorting
-  const handleSort = (orderBy: string, orderDirection: 'asc' | 'desc') => {
-    updateSearchParams({ orderBy, orderDirection });
-  };
-
+ 
   // Handle limit change
   const handleLimitChange = (limit: number) => {
     updateSearchParams({ limit, page: 1 });
@@ -104,7 +96,7 @@ export function AccountsPageClient({ initialAccounts, initialMetadata }: Account
   useEffect(() => {
     const options = getCurrentSearchOptions();
     fetchAccounts(options);
-  }, [searchParams]);
+  }, [searchParams, getCurrentSearchOptions]);
 
   return (
     <div className="space-y-6">

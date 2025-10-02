@@ -53,6 +53,19 @@ export function PromissoryNoteSigner({
   const { switchChain, isPending: isSwitching, error: switchError } = useSwitchChain();
   const { data: walletClient } = useWalletClient();
 
+  // Check if chain is supported by the wallet
+  const isChainSupported = useCallback(() => {
+    if (!signingEventDetails?.contractDetails.chainId) return false;
+    const supportedChains = SUPPORTED_CHAIN_IDS; // Mainnet and Sepolia
+    return supportedChains.includes(signingEventDetails.contractDetails.chainId);
+  }, [signingEventDetails?.contractDetails.chainId]);
+
+  // Check if network matches
+  const isCorrectNetwork = useCallback(() => {
+    if (!isConnected || !signingEventDetails || !chainId) return false;
+    return chainId === signingEventDetails.contractDetails.chainId;
+  }, [isConnected, signingEventDetails, chainId]);
+
   // Debug logging
   useEffect(() => {
     console.log('Wagmi state:', {
@@ -72,7 +85,7 @@ export function PromissoryNoteSigner({
         isChainSupported: isChainSupported()
       });
     }
-  }, [address, isConnected, chainId, switchChain, isSwitching, switchError, signingEventDetails]);
+  }, [address, isConnected, chainId, switchChain, isSwitching, switchError, signingEventDetails, isCorrectNetwork, isChainSupported]);
 
   // Fetch blockchain data
   const fetchBlockchainData = useCallback(async () => {
@@ -113,7 +126,7 @@ export function PromissoryNoteSigner({
     } finally {
       setIsLoadingBlockchainData(false);
     }
-  }, [signingEventDetails]);
+  }, [signingEventDetails, toast]);
 
   // Fetch signing event details when component mounts
   useEffect(() => {
@@ -163,12 +176,6 @@ export function PromissoryNoteSigner({
     });
   };
 
-  // Check if chain is supported by the wallet
-  const isChainSupported = () => {
-    if (!signingEventDetails?.contractDetails.chainId) return false;
-    const supportedChains =SUPPORTED_CHAIN_IDS // Mainnet and Sepolia
-    return supportedChains.includes(signingEventDetails.contractDetails.chainId);
-  };
 
   // Add chain to wallet
   const addChainToWallet = async () => {
@@ -321,12 +328,6 @@ export function PromissoryNoteSigner({
     if (!issuerParty) return false;
     
     return address.toLowerCase() === issuerParty.walletAddress.toLowerCase();
-  };
-
-  // Check if network matches
-  const isCorrectNetwork = () => {
-    if (!isConnected || !signingEventDetails || !chainId) return false;
-    return chainId === signingEventDetails.contractDetails.chainId;
   };
 
   // Sign document as ISSUER

@@ -106,7 +106,7 @@ export async function createUser(
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessages = error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+      const errorMessages = error.issues.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
       return {
         success: false,
         error: `Validation failed: ${errorMessages}`
@@ -270,7 +270,7 @@ export async function validateUserCreationData(
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const validationErrors = error.errors.map(err => `${err.path.join('.')}: ${err.message}`);
+      const validationErrors = error.issues.map(err => `${err.path.join('.')}: ${err.message}`);
       errors.push(...validationErrors);
     } else {
       errors.push('An unexpected error occurred during validation');

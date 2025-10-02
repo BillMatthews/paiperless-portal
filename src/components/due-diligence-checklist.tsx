@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
-import {ChecklistItemInstance, CheckStatus} from "@/lib/types/checklist.types";
+import {ChecklistItemInstance, CheckStatus, CheckType} from "@/lib/types/checklist.types";
 
 
 interface ChecklistItemProps {
@@ -91,6 +91,78 @@ function ChecklistItem({ item, onChange }: ChecklistItemProps) {
       {item.notes.length > 0 && (
         <div className="mt-4 space-y-2">
           <h4 className="text-sm font-medium">Previous Notes</h4>
+          <div className="space-y-2">
+            {item.notes.map((note, index) => (
+              <div
+                key={`${note.createdAt}-${index}`}
+                className="text-sm bg-muted/50 p-3 rounded-md space-y-1"
+              >
+                <p className="text-muted-foreground text-xs">
+                  {format(new Date(note.createdAt), "PPp")}
+                </p>
+                <p>{note.note}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface AutomatedChecklistItemProps {
+  item: ChecklistItemInstance;
+}
+
+function AutomatedChecklistItem({ item }: AutomatedChecklistItemProps) {
+  // Debug logging to help identify the issue
+  console.log('AutomatedChecklistItem - item:', item);
+  console.log('AutomatedChecklistItem - guidance:', item.guidance);
+  
+  const statusMapping = {
+    "NOT_STARTED": "Not Started",
+    "IN_PROGRESS": "In Progress",
+    "SATISFACTORY": "Satisfactory",
+    "ADVERSE": "Adverse"
+  } as const;
+
+  const getStatusColor = (status: CheckStatus) => {
+    switch (status) {
+      case CheckStatus.SATISFACTORY:
+        return "text-green-600";
+      case CheckStatus.ADVERSE:
+        return "text-red-600";
+      case CheckStatus.IN_PROGRESS:
+        return "text-yellow-600";
+      default:
+        return "text-gray-600";
+    }
+  };
+
+  return (
+    <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="font-medium">{item.title}</span>
+          <div className="flex items-center gap-2">
+            <span className={`text-sm font-medium ${getStatusColor(item.status)}`}>
+              {statusMapping[item.status as unknown as keyof typeof statusMapping]}
+            </span>
+            <span className="text-xs text-muted-foreground bg-blue-100 text-blue-800 px-2 py-1 rounded">
+              Automated
+            </span>
+          </div>
+        </div>
+        <div className="mt-2">
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {item.guidance}
+          </p>
+        </div>
+      </div>
+
+      {item.notes.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <h4 className="text-sm font-medium">Notes</h4>
           <div className="space-y-2">
             {item.notes.map((note, index) => (
               <div
@@ -204,13 +276,23 @@ export function DueDiligenceChecklist({
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4">
-                {section.items.map((item, itemIndex) => (
-                  <ChecklistItem
-                    key={item.title}
-                    item={item}
-                    onChange={(status, note) => updateCheck(sectionIndex, itemIndex, status, note)}
-                  />
-                ))}
+                {section.items.map((item, itemIndex) => {
+                  // Default to MANUAL if checkType is undefined
+                  const isAutomated = item.checkType === CheckType.AUTOMATED;
+                  
+                  return isAutomated ? (
+                    <AutomatedChecklistItem
+                      key={item.title}
+                      item={item}
+                    />
+                  ) : (
+                    <ChecklistItem
+                      key={item.title}
+                      item={item}
+                      onChange={(status, note) => updateCheck(sectionIndex, itemIndex, status, note)}
+                    />
+                  );
+                })}
               </div>
             </AccordionContent>
           </AccordionItem>

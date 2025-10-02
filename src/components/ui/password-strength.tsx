@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 
 interface PasswordStrengthProps {

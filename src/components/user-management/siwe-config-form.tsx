@@ -147,7 +147,7 @@ export function SiweConfigForm({
           <ul className="space-y-1 text-xs text-muted-foreground">
             <li className="flex items-center space-x-2">
               <div className="w-1 h-1 bg-muted-foreground rounded-full" />
-              <span>Must start with "0x"</span>
+              <span>Must start with &quot;0x&quot;</span>
             </li>
             <li className="flex items-center space-x-2">
               <div className="w-1 h-1 bg-muted-foreground rounded-full" />

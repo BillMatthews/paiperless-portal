@@ -28,7 +28,7 @@ interface ChecklistSection {
 }
 
 interface DealPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function DealPage({ params }: DealPageProps) {
@@ -40,10 +40,12 @@ export default function DealPage({ params }: DealPageProps) {
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
+
   useEffect(() => {
     async function loadDeal() {
       try {
-        const dealData = await getDeal(params.id);
+        const resolvedParams = await params;
+        const dealData = await getDeal(resolvedParams.id);
         setDeal(dealData);
         
         // Fetch account details
@@ -82,7 +84,11 @@ export default function DealPage({ params }: DealPageProps) {
   const dealAge = formatDistanceToNow(createdDate, { addSuffix: false });
 
   const handleLocalChange = (updatedChecklist: { sections: ChecklistSection[] }) => {
+    if (!checklist) return;
+    
     setLocalChanges({
+      _id: checklist._id,
+      version: checklist.version,
       sections: updatedChecklist.sections.map(section => ({
         id: section.title,
         title: section.title,
@@ -101,7 +107,6 @@ export default function DealPage({ params }: DealPageProps) {
   const handleSaveChanges = async () => {
     if (!localChanges || !checklist) return;
 
-   
     try {
       setIsSaving(true);
       
@@ -164,9 +169,13 @@ export default function DealPage({ params }: DealPageProps) {
 
       // Only make API call if there are actual updates
       if (updates.length > 0) {
-        await updateDealDueDiligenceChecklist(params.id, updates);
+        console.log("Some Changes to save", JSON.stringify(updates))
+        const resolvedParams = await params;
+        await updateDealDueDiligenceChecklist(resolvedParams.id, updates);
         // Update the main checklist with the saved changes
         setChecklist(localChanges);
+      } else {
+        console.log("No Changes to save")
       }
     } catch (error) {
       console.error('Error updating checklist:', error);
@@ -384,7 +393,7 @@ export default function DealPage({ params }: DealPageProps) {
           {["IN_PROGRESS", "NEW"].includes(deal.processingDetails.status) && (
             <TabsContent value="dueDiligence">
               <DueDiligenceChecklist
-                  checklist={localChanges || {sections: []}}
+                  checklist={localChanges || checklist || {_id: '', version: 0, sections: []}}
                   onChecklistUpdate={handleLocalChange}
                   expandedSections={expandedSections}
                   onExpandedSectionsChange={setExpandedSections}
@@ -397,7 +406,7 @@ export default function DealPage({ params }: DealPageProps) {
           <TabsContent value="decision">
             <DealDecision
                 dealId={deal.processingDetails._id}
-                checklist={localChanges || {sections: []}}
+                checklist={localChanges || checklist || {_id: '', version: 0, sections: []}}
                 dealStatus={deal.processingDetails.status}
                 fundingDecision={deal.processingDetails.fundingDecision}
             />

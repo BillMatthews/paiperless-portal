@@ -2,7 +2,7 @@
 
 import { getServerSession } from "next-auth"
 import { getToken } from "next-auth/jwt"
-import { auth } from "@/app/api/auth/[...nextauth]/route"
+import { auth } from "@/lib/auth-config"
 import { 
     AuthResponseBody, 
     EmailLoginRequest, 

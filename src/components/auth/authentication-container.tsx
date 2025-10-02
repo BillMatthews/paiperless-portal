@@ -181,7 +181,7 @@ export function AuthenticationContainer({
 
       {/* Help text */}
       <div className="text-xs text-muted-foreground space-y-1">
-        <p><strong>Need help?</strong> Contact support if you're having trouble signing in.</p>
+        <p><strong>Need help?</strong> Contact support if you&apos;re having trouble signing in.</p>
         <p><strong>Security:</strong> All authentication methods use industry-standard security protocols.</p>
         <p><strong>Privacy:</strong> Your data is protected and never shared with third parties.</p>
       </div>

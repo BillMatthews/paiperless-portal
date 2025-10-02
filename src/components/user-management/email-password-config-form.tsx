@@ -193,7 +193,7 @@ export function EmailPasswordConfigForm({
             </li>
             <li className="flex items-center space-x-2">
               <div className="w-1 h-1 bg-muted-foreground rounded-full" />
-              <span>At least one special character (!@#$%^&*(),.?":{}|&lt;&gt;)</span>
+              <span>At least one special character (!@#$%^&*(),.?&quot;:{}|&lt;&gt;)</span>
             </li>
           </ul>
         </div>

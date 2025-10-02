@@ -11,12 +11,14 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {useEffect, useState} from "react";
 import {ChecklistInstance, ChecklistItemInstance} from "@/lib/types/checklist.types"
 import {getOnboarding} from "@/lib/actions/onboarding.actions";
-import {OnboardingResponse, OnboardingStatus} from "@/lib/types/onboarding.types";
+import {OnboardingResponse} from "@/lib/types/onboarding.types";
 import {OnboardingStatusBadge} from "@/components/onboarding/onboarding-status-badge";
 import {OnboardingDecision} from "@/components/onboarding/onboarding-decision";
 import {RegistrationDocumentViewerButton} from "@/components/onboarding/registration-document-viewer-button";
 
 import {updateDueDiligenceChecklist} from "@/lib/actions/checklist.actions";
+import {useRbac} from "@/hooks/use-rbac";
+import {ActionPermissions, EntityType, RbacAction} from "@/lib/rbac/permissions.types";
 
 interface ChecklistSection {
   title: string;
@@ -25,7 +27,7 @@ interface ChecklistSection {
 }
 
 interface DealPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function OnboardingProcessingPage({ params }: DealPageProps) {
@@ -35,11 +37,16 @@ export default function OnboardingProcessingPage({ params }: DealPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const {canPerformAction} = useRbac();
+  const actionPermissions: ActionPermissions = {
+    canApprove: canPerformAction(EntityType.ONBOARDING_REQUEST, RbacAction.APPROVE)
+  }
 
   useEffect(() => {
     async function loadOnboarding() {
       try {
-        const onboardingData = await getOnboarding(params.id);
+        const resolvedParams = await params;
+        const onboardingData = await getOnboarding(resolvedParams.id);
         setOnboarding(onboardingData);
         // Create deep copies of the checklist data
         const checklistData = JSON.parse(JSON.stringify(onboardingData.processingDetails.dueDiligenceChecks));
@@ -67,7 +74,11 @@ export default function OnboardingProcessingPage({ params }: DealPageProps) {
   const onboardinglAge = formatDistanceToNow(createdDate, { addSuffix: false });
 
   const handleLocalChange = (updatedChecklist: { sections: ChecklistSection[] }) => {
+    if (!checklist) return;
+    
     setLocalChanges({
+      _id: checklist._id,
+      version: checklist.version,
       sections: updatedChecklist.sections.map(section => ({
         id: section.title,
         title: section.title,
@@ -176,9 +187,11 @@ export default function OnboardingProcessingPage({ params }: DealPageProps) {
 
         <Tabs defaultValue="details">
           <TabsList>
-            <TabsTrigger value="details">Deal Details</TabsTrigger>
+            <TabsTrigger value="details">Registration Details</TabsTrigger>
             <TabsTrigger value="dueDiligence">Due Diligence</TabsTrigger>
-            <TabsTrigger value="decision">Decision</TabsTrigger>
+            {actionPermissions.canApprove && (
+              <TabsTrigger value="decision">Decision</TabsTrigger>
+              )}
           </TabsList>
 
           <TabsContent value="details" className="space-y-6">
@@ -305,7 +318,7 @@ export default function OnboardingProcessingPage({ params }: DealPageProps) {
 
           <TabsContent value="dueDiligence">
             <DueDiligenceChecklist
-                checklist={localChanges || {sections: []}}
+                checklist={localChanges || checklist || {_id: '', version: 0, sections: []}}
                 onChecklistUpdate={handleLocalChange}
                 expandedSections={expandedSections}
                 onExpandedSectionsChange={setExpandedSections}
@@ -314,15 +327,16 @@ export default function OnboardingProcessingPage({ params }: DealPageProps) {
             />
           </TabsContent>
 
-          <TabsContent value="decision">
-            <OnboardingDecision
-                onboardingId={onboarding.processingDetails._id}
-                checklist={localChanges || {sections: []}}
-                onboardingStatus={onboarding.processingDetails.status}
-                onboardingDecision={onboarding.processingDetails.onboardingDecision}
-            />
-          </TabsContent>
-
+          {actionPermissions.canApprove && (
+            <TabsContent value="decision">
+              <OnboardingDecision
+                  onboardingId={onboarding.processingDetails._id}
+                  checklist={localChanges || checklist || {_id: '', version: 0, sections: []}}
+                  onboardingStatus={onboarding.processingDetails.status}
+                  onboardingDecision={onboarding.processingDetails.onboardingDecision}
+              />
+            </TabsContent>
+          )}
 
         </Tabs>
 

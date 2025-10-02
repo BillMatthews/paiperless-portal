@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
   Table,
@@ -53,7 +53,7 @@ export default function UserManagementClientPage() {
   const [restoringUser, setRestoringUser] = useState<AccountUserDetails | null>(null);
   const [isRestoring, setIsRestoring] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
       const sortByColumn = sortField || 'createdAt';
@@ -76,7 +76,7 @@ export default function UserManagementClientPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [searchTerm, currentPage, sortField, sortDirection, includeDeleted]);
 
   useEffect(() => {
     // Add debounce for search
@@ -85,7 +85,7 @@ export default function UserManagementClientPage() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, currentPage, sortField, sortDirection, includeDeleted]);
+  }, [searchTerm, currentPage, sortField, sortDirection, includeDeleted, fetchUsers]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {

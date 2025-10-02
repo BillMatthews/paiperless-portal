@@ -17,11 +17,11 @@ interface RefreshResponse {
  */
 async function attemptTokenRefresh(apiKey: string): Promise<string | null> {
   try {
-    const token = await getToken({ 
+    const token = await getToken({
       req: { cookies: await cookies() } as any,
       secret: process.env.NEXTAUTH_SECRET
     }) as any
-    
+
     if (!token?.refreshToken) {
       console.warn("No refresh token available for token refresh")
       return null
@@ -30,7 +30,7 @@ async function attemptTokenRefresh(apiKey: string): Promise<string | null> {
     const response = await fetch(`${process.env.TRADE_DOCUMENTS_API_URL}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" ,
-          'x-api-key': apiKey},
+        'x-api-key': apiKey},
       body: JSON.stringify({ refreshToken: token.refreshToken }),
     })
 
@@ -40,7 +40,7 @@ async function attemptTokenRefresh(apiKey: string): Promise<string | null> {
     }
 
     const data = await response.json() as RefreshResponse
-    
+
     // Update the JWT token with new tokens
     // Note: In a real implementation, you might want to update the session here
     // For now, we'll return the new access token to use immediately
@@ -56,25 +56,25 @@ async function attemptTokenRefresh(apiKey: string): Promise<string | null> {
  * and handles token refresh on 401 responses
  */
 export async function apiClient(
-  url: string, 
-  options: ApiClientOptions = {}
+    url: string,
+    options: ApiClientOptions = {}
 ): Promise<Response> {
-  const { 
-    requireAuth = true, 
+  const {
+    requireAuth = true,
     retryOnAuthFailure = true,
-    headers = {}, 
-    ...restOptions 
+    headers = {},
+    ...restOptions
   } = options
 
   // Get the access token if authentication is required
   let accessToken: string | undefined
   if (requireAuth) {
     try {
-      const token = await getToken({ 
+      const token = await getToken({
         req: { cookies: await cookies() } as any,
         secret: process.env.NEXTAUTH_SECRET
       }) as any
-      
+
       accessToken = token?.accessToken
     } catch (error) {
       console.warn("Failed to get access token:", error)
@@ -113,19 +113,19 @@ export async function apiClient(
   // If we get a 401 and retry is enabled, attempt token refresh
   if (response.status === 401 && retryOnAuthFailure && requireAuth) {
     console.log("Received 401, attempting token refresh...")
-    
+
     const newAccessToken = await attemptTokenRefresh(apiKey)
-    
+
     if (newAccessToken) {
       console.log("Token refresh successful, retrying original request...")
-      
+
       // Update headers with new token
       const retryHeaders: Record<string, string> = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${newAccessToken}`,
-          'x-api-key': apiKey,
+        'x-api-key': apiKey,
       }
-      
+
       // Add any additional headers if they exist
       if (typeof headers === 'object' && !Array.isArray(headers)) {
         Object.assign(retryHeaders, headers)
@@ -147,7 +147,7 @@ export async function apiClient(
     if (response.status === 403) {
       throw new ForbiddenError('Access forbidden - insufficient permissions', response)
     }
-    
+
     // For other error statuses, create appropriate API errors
     throw createApiError(response)
   }
@@ -206,29 +206,35 @@ export async function apiDelete(url: string, options: ApiClientOptions = {}) {
  * Convenience function for FormData requests (e.g., file uploads)
  */
 export async function apiFormData(url: string, formData: FormData, options: ApiClientOptions = {}) {
-  const { 
+  const {
     retryOnAuthFailure = true,
-    headers = {}, 
-    ...restOptions 
+    headers = {},
+    ...restOptions
   } = options
 
   // Get the access token if authentication is required
   let accessToken: string | undefined
   if (options.requireAuth !== false) {
     try {
-      const token = await getToken({ 
+      const token = await getToken({
         req: { cookies: await cookies() } as any,
         secret: process.env.NEXTAUTH_SECRET
       }) as any
-      
+
       accessToken = token?.accessToken
     } catch (error) {
       console.warn("Failed to get access token:", error)
     }
   }
+// Get the API Key
+  const apiKey = process.env.APP_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('APP_API_KEY environment variable is not set');
+  }
 
   // Prepare headers (don't set Content-Type for FormData)
-  const requestHeaders: Record<string, string> = {}
+  const requestHeaders: Record<string, string> = {'x-api-key': apiKey,}
 
   // Add any additional headers
   if (typeof headers === 'object' && !Array.isArray(headers)) {
@@ -251,17 +257,17 @@ export async function apiFormData(url: string, formData: FormData, options: ApiC
   // If we get a 401 and retry is enabled, attempt token refresh
   if (response.status === 401 && retryOnAuthFailure && options.requireAuth !== false) {
     console.log("Received 401 on FormData request, attempting token refresh...")
-    
-    const newAccessToken = await attemptTokenRefresh()
-    
+
+    const newAccessToken = await attemptTokenRefresh(apiKey)
+
     if (newAccessToken) {
       console.log("Token refresh successful, retrying original FormData request...")
-      
+
       // Update headers with new token
       const retryHeaders: Record<string, string> = {
         Authorization: `Bearer ${newAccessToken}`
       }
-      
+
       // Add any additional headers if they exist
       if (typeof headers === 'object' && !Array.isArray(headers)) {
         Object.assign(retryHeaders, headers)
@@ -285,7 +291,7 @@ export async function apiFormData(url: string, formData: FormData, options: ApiC
     if (response.status === 403) {
       throw new ForbiddenError('Access forbidden - insufficient permissions', response)
     }
-    
+
     // For other error statuses, create appropriate API errors
     throw createApiError(response)
   }

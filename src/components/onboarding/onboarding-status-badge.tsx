@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {DealStatus} from "@/lib/types/deal-desk.types";
 import {OnboardingStatus} from "@/lib/types/onboarding.types";
 
 interface OnboardingStatusBadgeProps {

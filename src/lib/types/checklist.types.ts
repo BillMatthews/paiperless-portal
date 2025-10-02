@@ -3,6 +3,7 @@ export enum ChecklistItemStatus {
     IN_PROGRESS = "IN_PROGRESS",
     ADVERSE = "ADVERSE",
     SATISFACTORY = "SATISFACTORY",
+    CRITICAL = "CRITICAL",
 }
 
 export enum CheckStatus {
@@ -12,6 +13,15 @@ export enum CheckStatus {
     ADVERSE = 'Adverse'
 }
 
+export enum CheckType {
+    MANUAL = 'MANUAL',
+    AUTOMATED = 'AUTOMATED'
+}
+
+export enum ChecklistType {
+    ONBOARDING = 'ONBOARDING',
+    DEAL_PROCESSING = 'DEAL_PROCESSING',
+}
 export interface CheckNote {
     note: string;
     createdAt: string;
@@ -28,6 +38,7 @@ export interface ChecklistItemInstance {
     guidance: string;
     status: CheckStatus;
     notes: CheckNote[];
+    checkType?: CheckType
 }
 
 export interface ChecklistSectionInstance {
@@ -37,5 +48,7 @@ export interface ChecklistSectionInstance {
     items: ChecklistItemInstance[];
 }
 export interface ChecklistInstance {
+    _id: string,
+    version: number,
     sections: ChecklistSectionInstance[];
 }

@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Wallet, Mail, Shield, Lock, Info } from 'lucide-react';
+import { Wallet, Mail,  Info } from 'lucide-react';
 import { AuthMethod } from '@/lib/types/authentication.types';
 
 interface AuthMethodSelectorProps {

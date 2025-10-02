@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiweLogin, EmailLogin, MfaVerification, ForcedPasswordReset } from "@/components/auth";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Wallet, Mail, Shield } from "lucide-react";
 import React from "react";
 

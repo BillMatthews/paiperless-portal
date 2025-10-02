@@ -6,7 +6,15 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "docker:build": "./scripts/build-docker.sh",
+    "docker:dev": "./scripts/docker-dev.sh up",
+    "docker:dev:down": "./scripts/docker-dev.sh down",
+    "docker:dev:logs": "./scripts/docker-dev.sh logs",
+    "docker:dev:shell": "./scripts/docker-dev.sh shell",
+    "docker:dev:clean": "./scripts/docker-dev.sh clean",
+    "docker:prod": "docker-compose up --build",
+    "docker:prod:down": "docker-compose down"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

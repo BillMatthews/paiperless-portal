@@ -1,5 +1,6 @@
 // Core RBAC types and enums
-export { EntityType, RbacAction, PermissionCheckResult, EntityActionPermission, RbacRule, PermissionChecker } from './permissions.types';
+export { EntityType, RbacAction } from './permissions.types';
+export type { PermissionCheckResult, EntityActionPermission, RbacRule, PermissionChecker } from './permissions.types';
 
 // Permission service and convenience functions
 export { PermissionsService, canPerformAction } from './permissions.service';
@@ -16,4 +17,4 @@ export {
 } from './server-actions';
 
 // Re-export authentication types for convenience
-export { UserPermission, ApplicationModule, ApplicationRole } from '@/lib/types/authentication.types';
+export type { UserPermission, ApplicationModule, ApplicationRole } from '@/lib/types/authentication.types';

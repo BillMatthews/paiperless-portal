@@ -13,6 +13,7 @@ import {DealPromissoryNoteDetails} from "@/lib/types/promissory-note.types";
 import {getChecklistTemplate} from "@/lib/actions/checklist.actions";
 import {apiGet, apiPatch, apiPost} from "@/lib/utils/api-client";
 import { handleServerActionError } from "@/lib/utils/error-handler";
+import {ChecklistType} from "@/lib/types/checklist.types";
 
 const apiUrl = process.env.TRADE_DOCUMENTS_API_URL;
 if (!apiUrl) {
@@ -64,9 +65,9 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
       const [accountDetails, dealDetails, checklistTemplate] = await Promise.all([
         getDealAccountDetails(processingDetails.accountId),
         getDealDetails(processingDetails.accountId, processingDetails.dealId),
-        getChecklistTemplate(processingDetails.dueDiligenceChecklistVersion)
+        getChecklistTemplate(ChecklistType.DEAL_PROCESSING,  processingDetails.dueDiligenceChecks.version)
       ]);
-  
+
       // If we have a checklist template and due diligence checks, populate the guidance
       if (checklistTemplate && Array.isArray(processingDetails.dueDiligenceChecks)) {
         // Convert the array to the expected ChecklistInstance structure
@@ -104,7 +105,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
         };
         
         // Update the processing details with the new structure
-        processingDetails.dueDiligenceChecks = updatedChecks;
+        processingDetails.dueDiligenceChecks = {version: processingDetails.dueDiligenceChecks.version, _id: processingDetails.dueDiligenceChecks._id,...updatedChecks};
       }
   
   
@@ -134,6 +135,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
       }
   
       const data = await response.json();
+      console.log("getDealDetails", JSON.stringify(data))
       return {
         ...data,
         createdAt: new Date(data.createdAt),
@@ -224,6 +226,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
       }
   
       const data = await response.json();
+      console.log("getDealAccountDetails", JSON.stringify(data))
       return {
         ...data,
         createdAt: new Date(data.createdAt),
@@ -245,10 +248,7 @@ export async function getDeals(options: SearchOptions = {}): Promise<DealsSearch
         throw new Error(`Failed to fetch deal: ${response.statusText}`);
       }
   
-      const data = await response.json();
-      console.log("GET DEAL")
-      console.log(JSON.stringify(data, null, 2));
-      return data;
+      return await response.json();
     } catch (error) {
       return await handleServerActionError(error, 'getDealProcessingDetails');
     }
@@ -439,7 +439,7 @@ export async function updateDealDueDiligenceChecklist(dealId: string, updates: A
   }>;
 }>) {
   try {
-    const response = await apiPatch(`${apiUrl}/deal-processing/${dealId}/checklist`, JSON.stringify(updates));
+    const response = await apiPatch(`${apiUrl}/deal-processing/${dealId}/checklist`, updates);
 
     if (!response.ok) {
       throw new Error(`Failed to update checklist: ${response.statusText}`);

@@ -3,6 +3,9 @@ import { AccountsPageClient } from "@/components/customer-accounts/accounts-page
 import { AccountsErrorBoundary } from "@/components/customer-accounts/accounts-error-boundary";
 import { AccountsSearchResponse } from "@/lib/types/search.types";
 
+// Force dynamic rendering to avoid static generation issues with cookies
+export const dynamic = 'force-dynamic';
+
 export default async function CustomerAccountsPage({
   searchParams,
 }: {

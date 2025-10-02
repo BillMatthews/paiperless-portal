@@ -1,7 +1,7 @@
 "use client"
 import {SearchMetadata, SearchOptions} from "@/lib/types/search.types";
 import {useRouter, useSearchParams} from "next/navigation";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useState, useRef} from "react";
 import {getOnboardings} from "@/lib/actions/onboarding.actions";
 import {Search, SlidersHorizontal} from "lucide-react";
 import {Input} from "@/components/ui/input";
@@ -24,15 +24,16 @@ export function OnboardingsPageClient({initialOnboardings, initialMetadata}: Onb
     const [metadata, setMetadata] = useState<SearchMetadata>(initialMetadata);
     const [isLoading, setIsLoading] = useState(false);
     const [searchValue, setSearchValue] = useState(searchParams.get('queryTerm') || '');
+    const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
     // Get current search options from URL
-    const getCurrentSearchOptions = (): SearchOptions => ({
+    const getCurrentSearchOptions = useCallback((): SearchOptions => ({
         queryTerm: searchParams.get('queryTerm') || undefined,
         page: parseInt(searchParams.get('page') || '1'),
         limit: parseInt(searchParams.get('limit') || '10'),
         orderBy: searchParams.get('orderBy') || undefined,
         orderDirection: (searchParams.get('orderDirection') as 'asc' | 'desc') || undefined,
-    });
+    }), [searchParams]);
 
     // Update URL with new search options
     const updateSearchParams = (options: Partial<SearchOptions>) => {
@@ -64,23 +65,19 @@ export function OnboardingsPageClient({initialOnboardings, initialMetadata}: Onb
         }
     }
 
-    // Debounced search handler
-    const debouncedSearch = useCallback(
-        (() => {
-            let timeoutId: NodeJS.Timeout;
-            return (queryTerm: string) => {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    updateSearchParams({ queryTerm: queryTerm || undefined, page: 1 });
-                }, 300);
-            };
-        })(),
-        []
-    );
     // Handle search input
     const handleSearch = (queryTerm: string) => {
         setSearchValue(queryTerm);
-        debouncedSearch(queryTerm);
+        
+        // Clear existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        
+        // Set new timeout
+        searchTimeoutRef.current = setTimeout(() => {
+            updateSearchParams({ queryTerm: queryTerm || undefined, page: 1 });
+        }, 300);
     };
 
     // Handle pagination
@@ -102,7 +99,7 @@ export function OnboardingsPageClient({initialOnboardings, initialMetadata}: Onb
     useEffect(() => {
         const options = getCurrentSearchOptions();
         fetchOnboardings(options);
-    }, [searchParams]);
+    }, [searchParams, getCurrentSearchOptions]);
     return (
         <div className="space-y-6">
             <div>

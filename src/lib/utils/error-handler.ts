@@ -1,7 +1,7 @@
 "use server"
 
 import { redirect } from "next/navigation";
-import { ForbiddenError, UnauthorizedError } from "@/lib/errors/api-errors";
+import { ForbiddenError } from "@/lib/errors/api-errors";
 
 /**
  * Handles errors in server actions, with special handling for 403 Forbidden errors

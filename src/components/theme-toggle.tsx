@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Sun, Moon, Laptop } from "lucide-react"
+import { Sun, Moon } from "lucide-react"
 
 export function ThemeToggle() {
   const { setTheme, resolvedTheme, theme } = useTheme()

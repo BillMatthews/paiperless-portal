@@ -9,8 +9,6 @@ import {ChevronDown, ChevronLeft, ChevronRight, ChevronUp, EyeIcon,} from "lucid
 import {Button} from "@/components/ui/button";
 import {AccountsSummaryDto} from "@/lib/types/accounts.types";
 import {SearchMetadata} from "@/lib/types/search.types";
-import {ActionPermissions, EntityType, RbacAction} from "@/lib/rbac/permissions.types";
-import {useRbac} from "@/hooks/use-rbac";
 
 interface AccountsTableProps {
   accounts: AccountsSummaryDto[];

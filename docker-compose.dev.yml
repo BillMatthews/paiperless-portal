@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  voy-portal-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deps
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: pnpm run dev
+    restart: unless-stopped
+
+

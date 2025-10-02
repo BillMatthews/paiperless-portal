@@ -58,7 +58,7 @@ export function MfaVerification({
       console.log(`MFA Response: ${JSON.stringify(response)}`)
       
       if (!response.success) {
-        const errorMessage = response.message || 'MFA verification failed. Please try again.';
+        const errorMessage = 'MFA verification failed. Please try again.';
         setError(errorMessage);
         onError?.(errorMessage);
         toast.error(errorMessage);
@@ -198,7 +198,7 @@ export function MfaVerification({
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  Enter one of your backup codes if you can't access your authenticator app
+                  Enter one of your backup codes if you can&apos;t access your authenticator app
                 </p>
               </div>
 

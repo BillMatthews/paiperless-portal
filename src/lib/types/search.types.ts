@@ -1,6 +1,6 @@
 import {DealDto} from "@/lib/types/deal-desk.types";
 import {OnboardingDto} from "@/lib/types/onboarding.types";
-import {AccountDetailsDto, AccountsSummaryDto} from "@/lib/types/accounts.types";
+import { AccountsSummaryDto} from "@/lib/types/accounts.types";
 
 
 export interface SearchOptions {

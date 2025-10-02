@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -36,11 +36,7 @@ export function UserSettingsForm() {
     },
   });
 
-  useEffect(() => {
-    loadAccountDetails();
-  }, []);
-
-  const loadAccountDetails = async () => {
+  const loadAccountDetails = useCallback(async () => {
     try {
       const result = await getAccountUserDetails();
       if (result.success && result.data) {
@@ -57,7 +53,11 @@ export function UserSettingsForm() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [form]);
+
+  useEffect(() => {
+    loadAccountDetails().then();
+  }, [loadAccountDetails]);
 
   const onSubmit = async (data: FormData) => {
     setIsSaving(true);
@@ -80,11 +80,11 @@ export function UserSettingsForm() {
   const getStatusBadgeVariant = (status: AccountUserStatus) => {
     switch (status) {
       case AccountUserStatus.ACTIVE:
-        return 'success';
+        return 'default';
       case AccountUserStatus.SUSPENDED:
         return 'destructive';
       case AccountUserStatus.UNDER_REVIEW:
-        return 'warning';
+        return 'secondary';
       case AccountUserStatus.DELETED:
         return 'secondary';
       default:
@@ -162,7 +162,7 @@ export function UserSettingsForm() {
                   <div>
                     <Label className="text-sm font-medium">Account Status</Label>
                     <div className="mt-1">
-                      <Badge variant={getStatusBadgeVariant(accountDetails.status)}>
+                      <Badge variant={getStatusBadgeVariant(accountDetails.status as AccountUserStatus)}>
                         {accountDetails.status}
                       </Badge>
                     </div>
