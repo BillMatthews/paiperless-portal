@@ -67,7 +67,7 @@ export function Sidebar() {
                     <div className="p-4">
                         <div className="flex items-center justify-center">
                             <Image
-                                src="/paiperless-logo-horizontal.png"
+                                src="/logo-horizontal.png"
                                 alt="Paperless Logo"
                                 width={180}
                                 height={40}
