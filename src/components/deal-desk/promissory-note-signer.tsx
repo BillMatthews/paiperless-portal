@@ -520,7 +520,7 @@ export function PromissoryNoteSigner({
 
                 {/* Wallet Connection Section */}
                 <div className="border-t pt-4">
-                  <h4 className="font-medium mb-3">Connect the Issuer Wallet to sign this document on behalf of Paiperless</h4>
+                  <h4 className="font-medium mb-3">Connect the Issuer Wallet to sign this document on behalf of Paperless</h4>
                   
                   {documentStatus !== DocumentSigningStatus.IN_PROGRESS ? (
                     <div className="flex items-center gap-2 text-amber-600">

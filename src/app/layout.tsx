@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Paiperless Portal",
-  description: "Paiperless Platform Portal ",
+  title: "Paperless Portal",
+  description: "Paperless Platform Portal ",
 };
 
 export default function RootLayout({

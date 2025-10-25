@@ -6,7 +6,7 @@ export default function UsersManagementPage() {
             <div className="space-y-2 mb-8">
                 <h1 className="text-3xl font-bold tracking-tight">Portal User Management</h1>
                 <p className="text-muted-foreground">
-                    Manage the user accounts for Paiperless Portal
+                    Manage the user accounts for Paperless Portal
                 </p>
             </div>
             <UserManagementClientPage/>

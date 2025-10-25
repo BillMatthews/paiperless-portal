@@ -81,7 +81,7 @@ export function SiweLogin({
       const siweMessage = new SiweMessage({
         domain,
         address: walletAddress,
-        statement: `Sign in to ${domain} to access Paiperless. (Valid from ${now.toISOString()} to ${expiresAt.toISOString()})`,
+        statement: `Sign in to ${domain} to access Paperless. (Valid from ${now.toISOString()} to ${expiresAt.toISOString()})`,
         uri: window.location.origin,
         version: "1",
         chainId: ChainId.Stability,
