@@ -359,8 +359,12 @@ export function PromissoryNoteSigner({
       const { rpcUrl, contractAddress, documentId } = signingEventDetails.contractDetails;
       const signingService = new DocumentSigningService(rpcUrl, contractAddress);
 
-      // Get the signer from the connected wallet
-      const provider = new BrowserProvider(window.ethereum);
+      // Get the signer from the connected wallet (EIP-1193 provider injected by wallet extension)
+      const ethereum = (window as Window & { ethereum?: unknown }).ethereum;
+      if (!ethereum) {
+        throw new Error("No wallet provider available");
+      }
+      const provider = new BrowserProvider(ethereum as import("ethers").Eip1193Provider);
       const signer = await provider.getSigner();
 
       // Sign the document

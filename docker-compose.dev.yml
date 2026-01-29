@@ -1,5 +1,5 @@
-version: '3.8'
-
+# Development compose; run with: docker compose -f docker-compose.dev.yml up
+# Uses deps stage + volume mount; no production security constraints
 services:
   voy-portal-dev:
     build:
@@ -7,10 +7,10 @@ services:
       dockerfile: Dockerfile
       target: deps
     ports:
-      - "3000:3000"
+      - "3000:3002"
     environment:
-      - NODE_ENV=development
-      - NEXT_TELEMETRY_DISABLED=1
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
     volumes:
       - .:/app
       - /app/node_modules

@@ -1,6 +1,6 @@
 'use client';
 
-import {State, WagmiProvider} from 'wagmi'
+import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
